@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claro Sports × Magnifi | Ultimate Command Center</title>
+    
+    <!-- Core Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- CORE STYLES --- */
+        body { font-family: 'Inter', sans-serif; overflow: hidden; background-color: #f8fafc; color: #0f172a; }
+        
+        /* Transitions & Animations */
+        .fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Scrollbars */
+        .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .dark-scroll::-webkit-scrollbar-thumb { background: #334155; }
+        .dark-scroll::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        /* Platform Themes */
+        .theme-tiktok { background-color: #0B0F19; color: #e2e8f0; }
+        .theme-light { background-color: #f8fafc; color: #0f172a; }
+
+        /* Navigation States */
+        .nav-btn.active { background-color: #1e293b; color: white; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .nav-btn.active-sim { background-color: #064e3b; color: #6ee7b7; border: 1px solid #059669; }
+        .tab-btn.active { border-bottom-color: #da291c; color: #da291c; background-color: #fef2f2; }
+
+        /* CSS-Based Charts */
+        .bar-chart-container { display: flex; align-items: flex-end; gap: 8px; height: 100%; }
+        .bar-col { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; position: relative; group: 1; }
+        .bar-fill { width: 100%; background-color: #cbd5e1; border-radius: 4px 4px 0 0; transition: height 0.5s ease; position: relative; }
+        .bar-col:hover .bar-fill { background-color: #da291c; }
+        .bar-label { font-size: 10px; color: #64748b; text-align: center; margin-top: 6px; }
+        .bar-value { position: absolute; top: -20px; width: 100%; text-align: center; font-size: 10px; font-weight: bold; color: #0f172a; opacity: 0; transition: opacity 0.2s; }
+        .bar-col:hover .bar-value { opacity: 1; }
+
+        /* TikTok Heatmap Grid */
+        .heatmap-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 1rem; }
+        .heatmap-cell { aspect-ratio: 1/3; border-radius: 6px; position: relative; transition: all 0.3s ease; display: flex; align-items: flex-end; justify-content: center; overflow: hidden; background: rgba(255,255,255,0.05); }
+        .heatmap-fill { width: 100%; background: #10b981; border-radius: 4px; transition: height 0.5s ease; opacity: 0.8; }
+        .heatmap-cell:hover .heatmap-fill { opacity: 1; }
+        .heatmap-tooltip { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: white; opacity: 0; background: rgba(0,0,0,0.6); transition: opacity 0.2s; }
+        .heatmap-cell:hover .heatmap-tooltip { opacity: 1; }
+
+    </style>
+
+    <script>
+        // --- DATA VAULT: 100% Extraction from Source Files ---
+        const VAULT = {
+            business: {
+                // STRATEGIC PROFILE (Synthesized from Research)
+                about: "Claro Sports is the sports-media arm of América Móvil, operating as a pan-Latin ecosystem (TV + Digital) to drive telco retention and monetize sports rights. Beyond broadcasting to 17 markets, their strategic mandate is to increase the value of Claro's mobile/TV bundles while selling advertising and sponsorships on a massive scale.",
+                
+                // BUSINESS PILLARS (The "Job to be Done")
+                pillars: [
+                    { label: "Attract & Retain", icon: "magnet", text: "Keeping Claro subs sticky via exclusive sports rights (Olympics, etc)." },
+                    { label: "Monetize", icon: "dollar-sign", text: "Selling ads & sponsorships across Linear TV and Digital inventory." },
+                    { label: "Bundle Value", icon: "package", text: "Justifying higher ARPU for Claro Mobile/TV plans." }
+                ],
+
+                // STRATEGIC SIGNALS (2025 Context)
+                strategicSignals: [
+                    { label: "2025 Digital Relaunch", icon: "zap", desc: "Shift to 'Inmediatez'—instant access to results & streams." },
+                    { label: "Post-Marca Era", icon: "flag", desc: "Full independence to align 100% with América Móvil goals." },
+                    { label: "AI & Innovation", icon: "bot", desc: "Piloting RCS Chatbots (Infobip) for personalized fan updates." }
+                ],
+
+                // ENTITIES (CONFIRMED)
+                entities: [
+                    { name: "Claro Sports TV", type: "Linear", desc: "Multi-feed Pay TV channels (Basic/Premium) distributed Pan-LatAm." },
+                    { name: "Claro Video", type: "OTT", desc: "Streaming hub where sports packages are sold as premium add-ons." },
+                    { name: "Portal Claro Sports", type: "Digital", desc: "The central web/app destination (formerly Marca Claro alliance)." },
+                    { name: "Olympic Channel", type: "Partner", desc: "Strategic rights holding & co-production for Olympic content." },
+                    { name: "UnoTV", type: "Alliance", desc: "Key news distribution partner within the América Móvil family." }
+                ], 
+                
+                painPoints: [
+                    { title: "Event Volume", desc: "During Olympics/World Cups, there is simply too much footage for humans to watch and clip manually." },
+                    { title: "Vertical Video", desc: "Cropping widescreen TV feeds into vertical TikToks is currently a slow, manual editing process." },
+                    { title: "Localization", desc: "They have rights in 17 countries, but making 17 different highlight reels manually is impossible." },
+                    { title: "Sponsor Reporting", desc: "Manually tracking 'how many times did the Nissan logo appear?' is a massive time sink." }
+                ],
+                plays: [
+                    { title: "The Event Factory", icon: "zap", desc: "AI watches the game. AI clips the goals. Humans just approve." },
+                    { title: "Vertical Engine", icon: "smartphone", desc: "AI automatically keeps the ball in the center for TikTok (9:16) format." },
+                    { title: "Localized Feeds", icon: "globe", desc: "One master feed automatically spawns 17 versions for Colombia, Peru, etc." },
+                    { title: "FAST Activation", icon: "tv", desc: "Auto-group clips into 24/7 channels (e.g., 'Goals of the Week') to fill dead air." },
+                    { title: "Sponsor-Ready", icon: "dollar-sign", desc: "Auto-burn sponsor logos onto clips *before* they are published." }
+                ],
+                checklist: [
+                    "When/Where do your teams feel the most pressure?",
+                    "Which platforms (TikTok/YouTube) feel under-served?",
+                    "Is vertical cropping currently manual?",
+                    "Is creating localized highlights for 17 markets painful?",
+                    "How do you keep FAST channels fresh 24/7?",
+                    "Is sponsor reporting a bottleneck?",
+                    "What tools are you currently using?",
+                    "What does success look like in 12 months?"
+                ]
+            },
+            youtube: {
+                metrics: { subs: "4.8M", views: "3.8k", growth: "10.5%" },
+                geo: [
+                    { name: "Mexico", val: 40.21 }, { name: "Colombia", val: 10.68 }, 
+                    { name: "Peru", val: 8.01 }, { name: "Argentina", val: 5.87 }, { name: "Ecuador", val: 4.45 }
+                ],
+                age: [
+                    { label: "13-17", val: 5 }, 
+                    { label: "18-24", val: 25 }, 
+                    { label: "25-34", val: 55 }, // The 55% Core
+                    { label: "35-44", val: 10 }, 
+                    { label: "45+", val: 5 }
+                ],
+                er: { current: "1.51%", benchmark: "~2.5%" }
+            },
+            instagram: {
+                flagship: { handle: "@clarosports", followers: "682.3k", realER: "0.09%", paidIndex: "1.2x" },
+                lab: { handle: "@clarosportsco", followers: "13.2k", realER: "4.13%", paidIndex: "56x" },
+                brands: ["Disney", "Nike", "Adidas", "Apple", "FIFA", "Movistar", "Samsung"],
+                reelMultiplier: "13x"
+            },
+            tiktok: {
+                metrics: { followers: "2.0M", viralAvg: "292k", spread: "1,733x", paidLev: "22x" },
+                // Corrected Data: Mon=4, Tue=3, Wed=1, Thu=0, Fri=0, Sat=9, Sun=13 (Total 30)
+                heatmap: [4, 3, 1, 0, 0, 9, 13], 
+                simBaseline: 17800,
+                simOptimized: 291570,
+                simFeatures: [
+                    { title: "Auto-Repurposing", icon: "refresh-cw", desc: "Fill Mid-Week gaps by auto-clipping archival footage without editor hours." },
+                    { title: "A/B Testing", icon: "flask-conical", desc: "Smooth out volatility by auto-generating 5 variants per goal." },
+                    { title: "Sponsor Templates", icon: "layout-template", desc: "'Nissan Goal of the Week' bumpers added instantly to every clip." }
+                ]
+            }
+        };
+
+        // --- GLOBAL STATE ---
+        let APP_STATE = {
+            view: 'business', // business, youtube, instagram, tiktok, simulator
+            busTab: 'who', // who, where, pain
+            simMatches: 5,
+            simClips: 3,
+            simMode: 'baseline', // baseline vs optimized
+            checks: {} // checklist state
+        };
+
+    </script>
+</head>
+<body class="theme-light h-screen flex">
+
+    <!-- 1. LEFT SIDEBAR -->
+    <aside class="w-64 bg-slate-950 text-slate-400 flex flex-col flex-shrink-0 z-50 shadow-2xl border-r border-slate-800">
+        <!-- Logo Area -->
+        <div class="h-16 flex items-center px-5 border-b border-slate-800 bg-slate-950">
+            <div class="w-8 h-8 bg-gradient-to-br from-red-600 to-red-800 rounded-lg flex items-center justify-center font-bold text-white mr-3 shadow-lg shadow-red-900/50">C</div>
+            <div>
+                <h1 class="font-bold text-white text-sm tracking-wide">CLARO SPORTS</h1>
+                <p class="text-[10px] uppercase tracking-widest text-slate-500">Magnifi Audit</p>
+            </div>
+        </div>
+
+        <!-- Nav Links -->
+        <nav class="flex-1 overflow-y-auto py-6 px-3 space-y-1 custom-scroll dark-scroll">
+            <div class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-600">Strategic Core</div>
+            <button onclick="router('business')" id="nav-business" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all hover:bg-slate-800 hover:text-white">
+                <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Business Overview
+            </button>
+
+            <div class="px-3 mt-6 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-600">Platform Deep Dives</div>
+            <button onclick="router('youtube')" id="nav-youtube" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all hover:bg-slate-800 hover:text-white">
+                <i data-lucide="youtube" class="w-4 h-4"></i> YouTube Audit
+            </button>
+            <button onclick="router('instagram')" id="nav-instagram" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all hover:bg-slate-800 hover:text-white">
+                <i data-lucide="instagram" class="w-4 h-4"></i> Instagram Strategy
+            </button>
+            <button onclick="router('tiktok')" id="nav-tiktok" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all hover:bg-slate-800 hover:text-white">
+                <i data-lucide="music-2" class="w-4 h-4"></i> TikTok Pulse
+            </button>
+
+            <div class="px-3 mt-6 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-600">Tools</div>
+            <button onclick="router('simulator')" id="nav-simulator" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all hover:bg-emerald-900/50 text-emerald-500">
+                <i data-lucide="calculator" class="w-4 h-4"></i> ROI Simulator
+            </button>
+        </nav>
+
+        <!-- User Footer -->
+        <div class="p-4 border-t border-slate-800 bg-slate-900/50">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-white">MG</div>
+                <div>
+                    <p class="text-xs font-medium text-white">Magnifi Team</p>
+                    <p class="text-[10px] text-slate-500">Client View</p>
+                </div>
+            </div>
+            
+            <!-- Fine Print -->
+            <div class="text-[10px] text-slate-600 leading-tight border-t border-slate-800 pt-2">
+                Data aggregated from publicly available platforms via Magnifi's proprietary intelligence engine.
+            </div>
+        </div>
+    </aside>
+
+    <!-- 2. MAIN STAGE -->
+    <main class="flex-1 flex flex-col relative overflow-hidden transition-colors duration-300" id="main-stage">
+        
+        <!-- Header Bar -->
+        <header class="h-16 border-b flex items-center justify-between px-8 z-40 backdrop-blur-md transition-colors duration-300" id="top-bar">
+            <h2 id="page-title" class="text-xl font-bold">Dashboard</h2>
+        </header>
+
+        <!-- Content Injection Point -->
+        <div id="content" class="flex-1 overflow-y-auto p-8 custom-scroll relative scroll-smooth">
+            <!-- Dynamic Content Loads Here -->
+        </div>
+
+    </main>
+
+    <!-- 3. LOGIC & RENDERERS -->
+    <script>
+        // --- CORE NAVIGATION ---
+        function router(view) {
+            APP_STATE.view = view;
+            
+            // 1. Update Sidebar UI
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active', 'active-sim');
+                if(btn.id === `nav-${view}`) {
+                    btn.classList.add(view === 'simulator' ? 'active-sim' : 'active');
+                }
+            });
+
+            // 2. Handle Theme
+            const stage = document.getElementById('main-stage');
+            const header = document.getElementById('top-bar');
+            const title = document.getElementById('page-title');
+            const content = document.getElementById('content');
+            const isDark = ['tiktok', 'simulator'].includes(view);
+
+            if(isDark) {
+                stage.className = "flex-1 flex flex-col relative overflow-hidden transition-colors duration-300 theme-tiktok";
+                header.className = "h-16 border-b border-slate-700 flex items-center justify-between px-8 z-40 backdrop-blur-md bg-slate-900/80";
+                title.className = "text-xl font-bold text-white";
+                content.classList.remove('custom-scroll');
+                content.classList.add('dark-scroll');
+            } else {
+                stage.className = "flex-1 flex flex-col relative overflow-hidden transition-colors duration-300 theme-light";
+                header.className = "h-16 border-b border-slate-200 flex items-center justify-between px-8 z-40 backdrop-blur-md bg-white/80";
+                title.className = "text-xl font-bold text-slate-800";
+                content.classList.add('custom-scroll');
+                content.classList.remove('dark-scroll');
+            }
+
+            // 3. Render View
+            content.classList.remove('fade-in');
+            void content.offsetWidth; // Force reflow
+            content.classList.add('fade-in');
+
+            if(view === 'business') renderBusiness();
+            if(view === 'youtube') renderYoutube();
+            if(view === 'instagram') renderInstagram();
+            if(view === 'tiktok') renderTikTok();
+            if(view === 'simulator') renderSimulator();
+
+            lucide.createIcons();
+        }
+
+        // --- ACTIONS ---
+
+        function setBusTab(tab) {
+            APP_STATE.busTab = tab;
+            renderBusiness();
+        }
+
+        function toggleCheck(idx) {
+            APP_STATE.checks[idx] = !APP_STATE.checks[idx];
+            renderBusiness();
+        }
+
+        function setSimMode(mode) {
+            APP_STATE.simMode = mode;
+            renderSimulator();
+        }
+        
+        function updateSimInput(key, val) {
+            APP_STATE[key] = parseInt(val);
+            renderSimulator();
+        }
+
+        // --- VIEW RENDERERS ---
+
+        function renderBusiness() {
+            const container = document.getElementById('content');
+            document.getElementById('page-title').innerText = "Business Strategic Overview";
+
+            let tabContent = '';
+            if (APP_STATE.busTab === 'who') {
+                tabContent = `
+                    <div class="grid md:grid-cols-2 gap-8 animate-fade-in">
+                        <!-- 1. Strategic About Section (Redesigned) -->
+                        <div class="bg-white p-8 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                            <div>
+                                <h4 class="font-bold text-slate-900 mb-4 flex items-center gap-2">
+                                    <i data-lucide="info" class="w-4 h-4 text-red-600"></i> About Claro Sports
+                                </h4>
+                                <p class="text-sm text-slate-600 leading-relaxed mb-6">
+                                    ${VAULT.business.about}
+                                </p>
+                                
+                                <!-- Business Pillars -->
+                                <div class="grid grid-cols-3 gap-3 mb-6">
+                                    ${VAULT.business.pillars.map(p => `
+                                        <div class="p-3 bg-slate-50 rounded-lg border border-slate-100 text-center">
+                                            <div class="mx-auto w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 mb-2">
+                                                <i data-lucide="${p.icon}" class="w-3 h-3"></i>
+                                            </div>
+                                            <div class="text-[10px] font-bold text-slate-700 uppercase mb-1">${p.label}</div>
+                                            <div class="text-[9px] text-slate-500 leading-tight">${p.text}</div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            
+                            <!-- Strategic Context Sub-block -->
+                            <div class="bg-slate-50 rounded-lg p-4 border border-slate-100">
+                                <h5 class="text-xs font-bold text-slate-500 uppercase mb-3 tracking-wider">Strategic Signals (2025)</h5>
+                                <div class="space-y-3">
+                                    ${VAULT.business.strategicSignals.map(s => `
+                                        <div class="flex items-start gap-3">
+                                            <div class="p-1.5 bg-white border border-slate-200 rounded text-slate-400 shadow-sm">
+                                                <i data-lucide="${s.icon}" class="w-3 h-3"></i>
+                                            </div>
+                                            <div>
+                                                <div class="text-xs font-bold text-slate-700">${s.label}</div>
+                                                <div class="text-[10px] text-slate-500 leading-tight">${s.desc}</div>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. Key Entities (Populated) -->
+                        <div class="bg-white p-8 rounded-xl border border-slate-200 shadow-sm flex flex-col">
+                            <h4 class="font-bold text-slate-900 mb-4 flex items-center gap-2">
+                                <i data-lucide="building-2" class="w-4 h-4 text-red-600"></i> Operating Ecosystem
+                            </h4>
+                            
+                            <div class="flex-1 space-y-4">
+                                ${VAULT.business.entities.map(e => `
+                                    <div class="flex items-center gap-4 p-3 rounded-lg border border-slate-100 hover:border-slate-300 hover:bg-slate-50 transition-all group">
+                                        <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-500 text-xs border border-slate-200 group-hover:bg-white group-hover:shadow-sm transition-all">
+                                            ${e.name.substring(0, 2).toUpperCase()}
+                                        </div>
+                                        <div>
+                                            <div class="flex items-center gap-2">
+                                                <span class="font-bold text-slate-900 text-sm">${e.name}</span>
+                                                <span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 text-[9px] font-bold uppercase tracking-wider border border-slate-200">${e.type}</span>
+                                            </div>
+                                            <div class="text-xs text-slate-500 mt-0.5">${e.desc}</div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            
+                            <div class="mt-6 pt-4 border-t border-slate-100 flex items-center gap-2 text-[10px] text-slate-400 italic">
+                                <i data-lucide="network" class="w-3 h-3"></i> Connected via América Móvil Infrastructure
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (APP_STATE.busTab === 'where') {
+                tabContent = `
+                    <div class="bg-white p-8 rounded-xl border border-slate-200 text-center animate-fade-in">
+                        <h3 class="text-2xl font-bold text-slate-900 mb-2">17+ Markets</h3>
+                        <p class="text-slate-500 mb-8">One engine feeding a massive ecosystem across Latin America.</p>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="p-4 bg-slate-50 rounded border border-slate-100 font-bold text-slate-700">Linear TV</div>
+                            <div class="p-4 bg-slate-50 rounded border border-slate-100 font-bold text-slate-700">OTT Apps</div>
+                            <div class="p-4 bg-slate-50 rounded border border-slate-100 font-bold text-slate-700">Social</div>
+                            <div class="p-4 bg-slate-50 rounded border border-slate-100 font-bold text-slate-700">FAST Channels</div>
+                        </div>
+                        <div class="mt-6 text-xs text-slate-400 bg-slate-50 inline-block px-3 py-1 rounded">
+                            <i data-lucide="info" class="w-3 h-3 inline mr-1"></i> <strong>Layman Note:</strong> FAST channels are like "Pluto TV" or "Samsung TV Plus"—free, ad-supported channels that run 24/7. They need constant content to fill the screen.
+                        </div>
+                    </div>
+                `;
+            } else if (APP_STATE.busTab === 'pain') {
+                tabContent = `
+                    <div class="grid md:grid-cols-2 gap-4 animate-fade-in">
+                        ${VAULT.business.painPoints.map(p => `
+                            <div class="bg-white p-4 rounded border border-slate-200 shadow-sm">
+                                <div class="font-bold text-slate-900 flex items-center gap-2 mb-1"><i data-lucide="alert-triangle" class="w-4 h-4 text-orange-500"></i> ${p.title}</div>
+                                <div class="text-xs text-slate-500">${p.desc}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            container.innerHTML = `
+                <div class="max-w-5xl mx-auto space-y-10 pb-12">
+                    <!-- Hero -->
+                    <div class="text-center space-y-4">
+                        <span class="inline-block px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-bold uppercase tracking-widest">Executive Summary</span>
+                        <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900">The "Amplification Engine"</h1>
+                        <p class="text-xl text-slate-500 max-w-2xl mx-auto">Powering scale across 17+ markets without increasing headcount.</p>
+                    </div>
+
+                    <!-- Tabs -->
+                    <div class="bg-slate-50 rounded-xl border border-slate-200 overflow-hidden">
+                        <div class="flex border-b border-slate-200 bg-white">
+                            <button onclick="setBusTab('who')" class="tab-btn flex-1 py-4 text-sm font-bold text-slate-500 hover:bg-slate-50 border-b-2 border-transparent transition-all ${APP_STATE.busTab === 'who' ? 'active' : ''}">Who they are</button>
+                            <button onclick="setBusTab('where')" class="tab-btn flex-1 py-4 text-sm font-bold text-slate-500 hover:bg-slate-50 border-b-2 border-transparent transition-all ${APP_STATE.busTab === 'where' ? 'active' : ''}">Where they play</button>
+                            <button onclick="setBusTab('pain')" class="tab-btn flex-1 py-4 text-sm font-bold text-slate-500 hover:bg-slate-50 border-b-2 border-transparent transition-all ${APP_STATE.busTab === 'pain' ? 'active' : ''}">The Problem</button>
+                        </div>
+                        <div class="p-6 min-h-[250px] flex flex-col justify-center">
+                            ${tabContent}
+                        </div>
+                    </div>
+
+                    <!-- 5 Plays -->
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-4">The 5 Strategic Plays</h3>
+                        <div class="grid md:grid-cols-3 gap-4">
+                            ${VAULT.business.plays.map(play => `
+                                <div class="bg-slate-800 text-white p-4 rounded-lg flex flex-col gap-2 border border-slate-700 hover:border-slate-500 transition-colors">
+                                    <div class="flex items-center gap-2">
+                                        <div class="p-1.5 bg-slate-700 rounded"><i data-lucide="${play.icon}" class="w-4 h-4 text-emerald-400"></i></div>
+                                        <span class="font-bold text-sm">${play.title}</span>
+                                    </div>
+                                    <div class="text-xs text-slate-400 pl-8">${play.desc}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Checklist -->
+                    <div class="bg-white rounded-xl border border-slate-200 p-8">
+                        <h3 class="font-bold text-slate-900 mb-6 flex items-center gap-2"><i data-lucide="check-square" class="w-5 h-5 text-emerald-600"></i> Discovery Checklist</h3>
+                        <div class="grid md:grid-cols-2 gap-3">
+                            ${VAULT.business.checklist.map((q, i) => `
+                                <div onclick="toggleCheck(${i})" class="cursor-pointer p-3 rounded border transition-all flex gap-3 ${APP_STATE.checks[i] ? 'bg-emerald-50 border-emerald-200' : 'bg-slate-50 border-slate-100 hover:border-blue-300'}">
+                                    <div class="w-5 h-5 rounded border bg-white flex items-center justify-center text-emerald-600 ${APP_STATE.checks[i] ? 'border-emerald-500' : 'border-slate-300'}">
+                                        ${APP_STATE.checks[i] ? '<i data-lucide="check" class="w-3 h-3"></i>' : ''}
+                                    </div>
+                                    <span class="text-sm ${APP_STATE.checks[i] ? 'text-emerald-800 font-medium' : 'text-slate-600'}">${q}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        function renderYoutube() {
+            const container = document.getElementById('content');
+            document.getElementById('page-title').innerText = "YouTube Audit: The Sleeping Giant";
+
+            const geoBars = VAULT.youtube.geo.map(g => `
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="text-xs font-bold text-slate-500 w-20">${g.name}</span>
+                    <div class="flex-1 h-3 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-full bg-slate-800 rounded-full" style="width: ${g.val}%"></div>
+                    </div>
+                    <span class="text-xs font-bold text-slate-700 w-12 text-right">${g.val}%</span>
+                </div>
+            `).join('');
+
+            const ageBars = VAULT.youtube.age.map(a => `
+                <div class="bar-col group">
+                    <div class="bar-value">${a.val}%</div>
+                    <div class="bar-fill ${a.label === '25-34' ? '!bg-red-600' : ''}" style="height: ${a.val}%;"></div>
+                    <div class="bar-label ${a.label === '25-34' ? 'font-bold text-red-600' : ''}">${a.label}</div>
+                </div>
+            `).join('');
+
+            container.innerHTML = `
+                <div class="max-w-5xl mx-auto space-y-8 pb-12">
+                    <!-- Top Stats (AUDITED: Tooltips flipped to drop DOWN) -->
+                    <div class="grid grid-cols-3 gap-6">
+                        
+                        <!-- Subscribers Card -->
+                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm relative group cursor-help z-10">
+                            <div class="flex items-center gap-2 mb-1">
+                                <div class="text-xs font-bold text-slate-400 uppercase">Subscribers</div>
+                                <i data-lucide="info" class="w-3 h-3 text-slate-300"></i>
+                            </div>
+                            <!-- Tooltip: Drops DOWN now -->
+                            <div class="absolute top-full left-0 mt-2 w-64 bg-slate-900 text-white text-[10px] p-3 rounded shadow-xl hidden group-hover:block z-50 border border-slate-700 pointer-events-none">
+                                <div class="font-bold text-emerald-400 mb-1 border-b border-slate-700 pb-1">Metric Context:</div>
+                                Total opted-in audience. A high sub count (4.8M) with low active views suggests a "Zombie Audience"—users who subscribed years ago for a specific event (e.g., Rio 2016) but are now inactive.
+                            </div>
+                            
+                            <div class="text-3xl font-bold text-slate-900 mt-1">${VAULT.youtube.metrics.subs}</div>
+                            <div class="text-xs text-emerald-600 mt-2 font-bold flex items-center gap-1"><i data-lucide="trending-up" class="w-3 h-3"></i> ${VAULT.youtube.metrics.growth}</div>
+                        </div>
+
+                        <!-- Avg Views Card -->
+                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm relative group cursor-help z-10">
+                             <div class="flex items-center gap-2 mb-1">
+                                <div class="text-xs font-bold text-slate-400 uppercase">Avg Views</div>
+                                <i data-lucide="info" class="w-3 h-3 text-slate-300"></i>
+                            </div>
+                            <!-- Tooltip: Drops DOWN now -->
+                            <div class="absolute top-full left-0 mt-2 w-64 bg-slate-900 text-white text-[10px] p-3 rounded shadow-xl hidden group-hover:block z-50 border border-slate-700 pointer-events-none">
+                                <div class="font-bold text-amber-400 mb-1 border-b border-slate-700 pb-1">Calculation & Insight:</div>
+                                (Total Views / Total Uploads). <br><br>
+                                3.8k avg views on a 4.8M channel implies <0.1% active viewership per video. This confirms the audience is "Passive"—they consume only when big events trigger them, not daily.
+                            </div>
+
+                            <div class="text-3xl font-bold text-slate-900 mt-1">${VAULT.youtube.metrics.views}</div>
+                            <div class="text-xs text-amber-600 mt-2 font-bold flex items-center gap-1"><i data-lucide="minus" class="w-3 h-3"></i> Passive Audience</div>
+                        </div>
+
+                        <!-- Top Market Card -->
+                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm relative group cursor-help z-10">
+                            <div class="flex items-center gap-2 mb-1">
+                                <div class="text-xs font-bold text-slate-400 uppercase">Top Market</div>
+                                <i data-lucide="info" class="w-3 h-3 text-slate-300"></i>
+                            </div>
+                            <!-- Tooltip: Drops DOWN now -->
+                            <div class="absolute top-full right-0 mt-2 w-64 bg-slate-900 text-white text-[10px] p-3 rounded shadow-xl hidden group-hover:block z-50 border border-slate-700 pointer-events-none">
+                                <div class="font-bold text-blue-400 mb-1 border-b border-slate-700 pb-1">Strategic Implication:</div>
+                                Determined by viewer IP address. <br><br>
+                                Since 40% of traffic is Mexican, your CPM (cost per mille) is pegged to the Mexican ad market. It also means global content must be localized with Mexican Spanish nuance to maximize retention.
+                            </div>
+
+                            <div class="text-3xl font-bold text-slate-900 mt-1">Mexico</div>
+                            <div class="text-xs text-slate-500 mt-2">40.21% Share</div>
+                        </div>
+                    </div>
+
+                    <!-- Geo & Age (AUDITED: Added missing Tooltips) -->
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm relative">
+                            <h3 class="font-bold text-slate-900 mb-4 flex items-center gap-2 group cursor-help w-fit">
+                                Geographic Breakdown 
+                                <i data-lucide="info" class="w-4 h-4 text-slate-300"></i>
+                                <!-- Tooltip -->
+                                <div class="absolute top-8 left-0 w-64 bg-slate-900 text-white text-[10px] p-3 rounded shadow-xl hidden group-hover:block z-50 font-normal border border-slate-700">
+                                    <strong class="text-emerald-400">Data Source:</strong> Audience location by Subscribers.<br>
+                                    Note the "Long Tail" effect: While Mexico dominates, the combined force of Colombia, Peru, and Argentina (approx 25%) represents a massive secondary market that often gets neglected in content localization.
+                                </div>
+                            </h3>
+                            <div class="space-y-1">${geoBars}</div>
+                            <div class="mt-4 p-3 bg-slate-50 rounded text-xs text-slate-600">
+                                <strong>Layman Note:</strong> 93% of the audience speaks Spanish. This means we can make one video and it works for almost everyone (Mexico, Colombia, Peru), making localization easier.
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col relative">
+                            <h3 class="font-bold text-slate-900 mb-4 flex items-center gap-2 group cursor-help w-fit">
+                                Age Distribution
+                                <i data-lucide="info" class="w-4 h-4 text-slate-300"></i>
+                                <!-- Tooltip -->
+                                <div class="absolute top-8 left-0 w-64 bg-slate-900 text-white text-[10px] p-3 rounded shadow-xl hidden group-hover:block z-50 font-normal border border-slate-700">
+                                    <strong class="text-red-400">Data Source:</strong> Demographics by active commenters.<br>
+                                    This 25-34 spike (55%) is critical. These aren't kids watching cartoons; they are young professionals with purchasing power, highly compatible with betting partners, auto sponsors (Nissan), and tech brands.
+                                </div>
+                            </h3>
+                            <div class="bar-chart-container flex-1 pt-6 pb-2 px-2">
+                                ${ageBars}
+                            </div>
+                            <div class="mt-4 text-xs text-center text-slate-500 font-medium bg-red-50 py-2 rounded text-red-700">
+                                55% of audience is 25-34. The "Shorts Generation".
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reality Check (AUDITED: Fixed Format Trend Tooltips) -->
+                    <div class="bg-slate-50 rounded-xl border border-slate-200 p-8">
+                        <h3 class="font-bold text-slate-900 mb-6 text-lg">The Reality Check</h3>
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-400 uppercase mb-3 flex items-center gap-2 group relative w-fit cursor-help">
+                                    Engagement Rate (ER)
+                                    <i data-lucide="help-circle" class="w-3 h-3 text-slate-400"></i>
+                                    <!-- Tooltip: Pops UP -->
+                                    <span class="absolute bottom-full left-0 mb-2 hidden group-hover:block w-64 bg-slate-900 text-white text-[10px] p-3 rounded z-50 shadow-xl border border-slate-700">
+                                        <strong class="text-emerald-400 block mb-1">The "Do They Care?" Metric</strong>
+                                        Formula: (Likes + Comments) / Views. <br>
+                                        1.5% is low. A healthy channel typically sees 3-5%. It means viewers watch but don't react.
+                                    </span>
+                                </h4>
+                                <div class="flex items-center gap-4 mb-2">
+                                    <div class="text-2xl font-bold text-red-600">${VAULT.youtube.er.current}</div>
+                                    <div class="text-xs text-slate-400">Claro Current</div>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <div class="text-2xl font-bold text-emerald-600">${VAULT.youtube.er.benchmark}</div>
+                                    <div class="text-xs text-slate-400">Benchmark (>1M Subs)</div>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-400 uppercase mb-3 flex items-center gap-2 group relative w-fit cursor-help">
+                                    Format Trends
+                                    <i data-lucide="info" class="w-3 h-3 text-slate-400"></i>
+                                    <!-- Tooltip: Pops UP -->
+                                    <div class="absolute bottom-full left-0 mb-2 w-56 bg-slate-900 text-white text-[10px] p-3 rounded hidden group-hover:block z-50 border border-slate-700 shadow-lg">
+                                        <strong class="text-blue-400 block mb-1">Content Efficiency</strong>
+                                        Comparing how different video types perform. 'Shorts' often drive subscribers, while 'Live' drives watch time.
+                                    </div>
+                                </h4>
+                                <ul class="space-y-2 text-sm">
+                                    <li class="flex justify-between items-center p-2 bg-white border border-slate-200 rounded group relative cursor-help">
+                                        <span>Long Form (Videos)</span>
+                                        <span class="text-red-500 font-bold text-xs">▼ Engagement Down</span>
+                                         <!-- Format Tooltip 1 -->
+                                        <div class="absolute bottom-full right-0 mb-2 w-56 bg-slate-900 text-white text-[9px] p-3 rounded hidden group-hover:block z-50 border border-slate-700 shadow-lg">
+                                            <strong class="text-red-400 block mb-1">Traditional VOD Dying?</strong>
+                                            Engagement on horizontal video dropped 3.4%. The algorithm is deprioritizing this format for non-premium content.
+                                        </div>
+                                    </li>
+                                    <li class="flex justify-between items-center p-2 bg-white border-l-4 border-emerald-500 shadow-sm rounded group relative cursor-help">
+                                        <span>Shorts (Vertical)</span>
+                                        <span class="text-emerald-600 font-bold text-xs">▲ All Metrics Up</span>
+                                         <!-- Format Tooltip 2 -->
+                                        <div class="absolute bottom-full right-0 mb-2 w-56 bg-slate-900 text-white text-[9px] p-3 rounded hidden group-hover:block z-50 border border-slate-700 shadow-lg">
+                                            <strong class="text-emerald-400 block mb-1">The Growth Engine</strong>
+                                            Engagement UP 16%. Views UP 18%. This is the only format growing organically.
+                                        </div>
+                                    </li>
+                                     <li class="flex justify-between items-center p-2 bg-white border border-slate-200 rounded group relative cursor-help">
+                                        <span>Live Streams</span>
+                                        <span class="text-amber-500 font-bold text-xs">~ Volatile</span>
+                                        <!-- Format Tooltip 3 -->
+                                        <div class="absolute bottom-full right-0 mb-2 w-56 bg-slate-900 text-white text-[9px] p-3 rounded hidden group-hover:block z-50 border border-slate-700 shadow-lg">
+                                            High views during matches, zero views after. Good for "Now", bad for "Later".
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        function renderInstagram() {
+            const container = document.getElementById('content');
+            document.getElementById('page-title').innerText = "Instagram: The Two-Handle Strategy";
+
+            const iData = VAULT.instagram;
+
+            container.innerHTML = `
+                <div class="max-w-6xl mx-auto space-y-10 pb-12">
+                    <!-- Enablement Strategy (Simplified for Layman) -->
+                    <div class="bg-slate-50 rounded-xl border border-slate-200 p-8 text-center">
+                        <h3 class="text-xl font-bold text-slate-900 mb-2">The Game Plan</h3>
+                        <p class="text-sm text-slate-500 mb-8 max-w-2xl mx-auto">How we turn a chaotic content process into a predictable factory line.</p>
+                        
+                        <div class="grid md:grid-cols-3 gap-6 text-left">
+                            <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm relative group cursor-help">
+                                <div class="w-8 h-8 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold mb-3">1</div>
+                                <h4 class="font-bold text-slate-900 mb-1">The Factory</h4>
+                                <p class="text-xs text-slate-500">Instead of editors manually watching games, our AI automatically clips every goal and highlight instantly.</p>
+                                <!-- Tooltip -->
+                                <div class="absolute top-full left-0 mt-2 w-full bg-slate-900 text-white text-[10px] p-3 rounded shadow-xl hidden group-hover:block z-50 border border-slate-700 pointer-events-none">
+                                    <strong class="text-emerald-400 block mb-1">Efficiency Gain:</strong> 
+                                    Reduces clip-to-publish time from ~15 mins to ~2 mins. Essential for "Live" coverage.
+                                </div>
+                            </div>
+                            <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm relative group cursor-help">
+                                <div class="absolute top-1/2 -right-3 w-6 h-6 bg-slate-200 rotate-45 transform hidden md:block z-0"></div>
+                                <div class="w-8 h-8 bg-red-600 text-white rounded-full flex items-center justify-center font-bold mb-3 relative z-10">2</div>
+                                <h4 class="font-bold text-slate-900 mb-1">The Test Kitchen</h4>
+                                <p class="text-xs text-slate-500">We serve the clips to the smaller Colombia account first. If they flop, no one cares. If they go viral, we know it's a winner.</p>
+                                <!-- Tooltip -->
+                                <div class="absolute top-full left-0 mt-2 w-full bg-slate-900 text-white text-[10px] p-3 rounded shadow-xl hidden group-hover:block z-50 border border-slate-700 pointer-events-none">
+                                    <strong class="text-red-400 block mb-1">Risk Mitigation:</strong> 
+                                    Protect the Flagship's algorithm score by testing content on a low-risk account (@clarosportsco) first.
+                                </div>
+                            </div>
+                            <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm relative group cursor-help">
+                                <div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mb-3">3</div>
+                                <h4 class="font-bold text-slate-900 mb-1">The Showroom</h4>
+                                <p class="text-xs text-slate-500">We take the viral "winners" from Colombia and post them to the massive Mexico account for guaranteed engagement.</p>
+                                <!-- Tooltip -->
+                                <div class="absolute top-full left-0 mt-2 w-full bg-slate-900 text-white text-[10px] p-3 rounded shadow-xl hidden group-hover:block z-50 border border-slate-700 pointer-events-none">
+                                    <strong class="text-blue-400 block mb-1">Maximizing Reach:</strong> 
+                                    Only proven, high-performing content hits the 682k follower account, ensuring maximum viral spread.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Comparison Header -->
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <!-- Flagship -->
+                        <div class="bg-white rounded-xl border border-blue-200 shadow-sm overflow-hidden hover:border-blue-400 transition-colors relative group">
+                            <div class="h-2 bg-blue-600"></div>
+                            <div class="p-6">
+                                <div class="flex justify-between items-start mb-6">
+                                    <div>
+                                        <h3 class="text-xl font-bold text-slate-900">${iData.flagship.handle}</h3>
+                                        <div class="text-xs text-blue-400 uppercase font-bold mt-1">Flagship (Mexico)</div>
+                                    </div>
+                                    <span class="px-2 py-1 bg-blue-50 text-blue-600 text-xs font-bold rounded">The Showroom</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 mb-4">
+                                    <div class="group/metric relative cursor-help">
+                                        <div class="text-xs text-slate-500 uppercase flex items-center gap-1">Followers <i data-lucide="info" class="w-3 h-3 text-slate-300"></i></div>
+                                        <div class="text-xl font-bold text-slate-900">${iData.flagship.followers}</div>
+                                        <!-- Followers Tooltip -->
+                                        <div class="absolute bottom-full left-0 mb-2 w-48 bg-slate-900 text-white text-[10px] p-2 rounded hidden group-hover/metric:block z-50 border border-slate-700 shadow-lg">
+                                            Massive reach but 27% "Fake/Suspicious" followers (Modash audit). Requires careful content curation to wake up the algorithm.
+                                        </div>
+                                    </div>
+                                    <div class="group/metric relative cursor-help">
+                                        <div class="text-xs text-slate-500 uppercase flex items-center gap-1">Real ER <i data-lucide="info" class="w-3 h-3 text-slate-300"></i></div>
+                                        <div class="text-xl font-bold text-blue-600">${iData.flagship.realER}</div>
+                                        <!-- ER Tooltip -->
+                                        <div class="absolute bottom-full left-0 mb-2 w-48 bg-slate-900 text-white text-[10px] p-2 rounded hidden group-hover/metric:block z-50 border border-slate-700 shadow-lg">
+                                            <strong class="text-red-400">Warning Sign:</strong> 0.09% is very low (Benchmark ~1-2%). This confirms the need for the "Test Kitchen" strategy to only post winners here.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-slate-50 p-3 rounded text-xs text-slate-500">
+                                    <strong>Role:</strong> Massive reach, but we can't afford to post "bad" content here. It needs proven hits.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Lab -->
+                        <div class="bg-white rounded-xl border border-red-200 shadow-sm overflow-hidden hover:border-red-400 transition-colors relative group">
+                            <div class="h-2 bg-red-600"></div>
+                            <div class="p-6">
+                                <div class="flex justify-between items-start mb-6">
+                                    <div>
+                                        <h3 class="text-xl font-bold text-slate-900">${iData.lab.handle}</h3>
+                                        <div class="text-xs text-red-400 uppercase font-bold mt-1">Lab (Colombia)</div>
+                                    </div>
+                                    <span class="px-2 py-1 bg-red-50 text-red-600 text-xs font-bold rounded">The Test Kitchen</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 mb-4">
+                                    <div class="group/metric relative cursor-help">
+                                        <div class="text-xs text-slate-500 uppercase flex items-center gap-1">Followers <i data-lucide="info" class="w-3 h-3 text-slate-300"></i></div>
+                                        <div class="text-xl font-bold text-slate-900">${iData.lab.followers}</div>
+                                        <!-- Followers Tooltip -->
+                                        <div class="absolute bottom-full left-0 mb-2 w-48 bg-slate-900 text-white text-[10px] p-2 rounded hidden group-hover/metric:block z-50 border border-slate-700 shadow-lg">
+                                            Smaller, agile audience. Perfect for high-frequency testing without annoying the mass market.
+                                        </div>
+                                    </div>
+                                    <div class="group/metric relative cursor-help">
+                                        <div class="text-xs text-slate-500 uppercase flex items-center gap-1">Real ER <i data-lucide="info" class="w-3 h-3 text-slate-300"></i></div>
+                                        <div class="text-xl font-bold text-red-600">${iData.lab.realER}</div>
+                                        <!-- ER Tooltip -->
+                                        <div class="absolute bottom-full left-0 mb-2 w-48 bg-slate-900 text-white text-[10px] p-2 rounded hidden group-hover/metric:block z-50 border border-slate-700 shadow-lg">
+                                            <strong class="text-emerald-400">High Engagement:</strong> 4.13% is excellent. This account is "alive" and reactive, making it the perfect testing ground.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-slate-50 p-3 rounded text-xs text-slate-500">
+                                    <strong>Role:</strong> High engagement. We use paid boosts here (56x index) to force-test content rapidly.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Commercial Profile -->
+                    <div class="bg-white rounded-xl border border-slate-200 p-8 shadow-sm">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="p-2 bg-slate-100 rounded text-slate-600"><i data-lucide="briefcase" class="w-5 h-5"></i></div>
+                            <h3 class="text-lg font-bold text-slate-900">Commercial Profile</h3>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-3 gap-8">
+                            <div class="group relative cursor-help">
+                                <h4 class="text-xs font-bold text-slate-400 uppercase mb-4 flex items-center gap-2">
+                                    Demographics <i data-lucide="info" class="w-3 h-3 text-slate-300"></i>
+                                </h4>
+                                <!-- Demo Tooltip -->
+                                <div class="absolute bottom-full left-0 mb-2 w-56 bg-slate-900 text-white text-[10px] p-3 rounded hidden group-hover:block z-50 border border-slate-700 shadow-lg">
+                                    <strong class="text-blue-400 block mb-1">Targeting Insight:</strong>
+                                    Heavily male (76%) and young (68% under 34). This audience is less responsive to traditional "TV-style" ads and demands authentic, fast-paced content.
+                                </div>
+                                <div class="space-y-4">
+                                    <div>
+                                        <div class="flex justify-between text-xs font-bold mb-1"><span>Male</span><span>76.6%</span></div>
+                                        <div class="h-1.5 bg-slate-100 rounded-full"><div class="h-full bg-slate-800 w-[76.6%] rounded-full"></div></div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-xs font-bold mb-1"><span>18-34</span><span>~68%</span></div>
+                                        <div class="h-1.5 bg-slate-100 rounded-full"><div class="h-full bg-blue-600 w-[68%] rounded-full"></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-400 uppercase mb-4">Top Brands</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    ${iData.brands.map(b => `<span class="px-2 py-1 bg-slate-100 text-slate-600 text-xs font-bold rounded border border-slate-200">${b}</span>`).join('')}
+                                </div>
+                            </div>
+
+                             <div class="group relative cursor-help">
+                                <h4 class="text-xs font-bold text-slate-400 uppercase mb-4 flex items-center gap-2">
+                                    Reel Multiplier <i data-lucide="info" class="w-3 h-3 text-slate-300"></i>
+                                </h4>
+                                <!-- Reel Multiplier Tooltip -->
+                                <div class="absolute bottom-full right-0 mb-2 w-56 bg-slate-900 text-white text-[10px] p-3 rounded hidden group-hover:block z-50 border border-slate-700 shadow-lg">
+                                    <strong class="text-emerald-400 block mb-1">The Golden Ratio:</strong>
+                                    Reels generate 13x more engagement than static image posts. The strategy must pivot to 90% video/Reels immediately to survive.
+                                </div>
+                                <div class="p-4 bg-slate-900 rounded-lg text-white">
+                                    <div class="text-2xl font-bold text-emerald-400 mb-1">${iData.reelMultiplier}</div>
+                                    <div class="text-xs text-slate-400">Higher ER on Reels vs Account Avg.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        function renderTikTok() {
+            const container = document.getElementById('content');
+            document.getElementById('page-title').innerText = "TikTok Pulse: Operational Audit";
+            const tData = VAULT.tiktok;
+
+            const heatmapCells = tData.heatmap.map(val => {
+                const max = 13;
+                const pct = (val / max) * 100;
+                const isZero = val === 0;
+                const bg = isZero ? '#1f2937' : 'rgba(16, 185, 129, 0.2)';
+                
+                return `
+                    <div class="heatmap-cell" style="background: ${bg}; border: ${isZero ? '1px dashed #374151' : 'none'}">
+                        <div class="heatmap-fill" style="height: ${pct}%"></div>
+                        <div class="heatmap-tooltip">${val} Posts</div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = `
+                <div class="max-w-6xl mx-auto space-y-8 pb-12">
+                     <!-- Metrics Grid -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <!-- Followers -->
+                        <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 backdrop-blur-sm relative group cursor-help z-20">
+                            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                                Followers <i data-lucide="info" class="w-3 h-3 text-slate-500"></i>
+                            </div>
+                            <!-- Tooltip -->
+                            <div class="absolute top-full left-0 mt-2 w-48 bg-black text-slate-300 text-[10px] p-3 rounded hidden group-hover:block z-50 border border-slate-700 shadow-xl">
+                                <strong class="text-emerald-400">Solid Base:</strong> 2M followers is significant leverage. However, +5.3% growth is slow for a sports channel during peak season.
+                            </div>
+                            <div class="text-3xl font-bold text-white mt-1">${tData.metrics.followers}</div>
+                            <div class="text-xs text-emerald-400 mt-2">+5.3% Growth</div>
+                        </div>
+
+                        <!-- Viral Avg -->
+                        <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 backdrop-blur-sm relative group cursor-help z-20">
+                            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                                Viral Avg <i data-lucide="info" class="w-3 h-3 text-slate-500"></i>
+                            </div>
+                            <!-- Tooltip -->
+                            <div class="absolute top-full left-0 mt-2 w-48 bg-black text-slate-300 text-[10px] p-3 rounded hidden group-hover:block z-50 border border-slate-700 shadow-xl">
+                                <strong class="text-blue-400">Last 30 Days Surge:</strong> 
+                                Recent average is 292k, vastly outperforming the lifetime average of 17.8k. This proves recent content changes are working, but consistency is key.
+                            </div>
+                            <div class="text-3xl font-bold text-white mt-1">${tData.metrics.viralAvg}</div>
+                            <div class="text-xs text-emerald-400 mt-2">Views (Last 30d)</div>
+                        </div>
+
+                        <!-- Paid Leverage -->
+                        <div class="bg-slate-800/50 p-6 rounded-2xl border border-amber-500/30 backdrop-blur-sm relative group cursor-help z-20">
+                            <div class="text-xs font-bold text-amber-500 uppercase tracking-wider flex items-center gap-1">
+                                Paid Leverage <i data-lucide="info" class="w-3 h-3"></i>
+                            </div>
+                            <!-- Tooltip -->
+                            <div class="absolute top-full left-0 mt-2 w-56 bg-black text-slate-300 text-[10px] p-3 rounded hidden group-hover:block z-50 border border-slate-700 shadow-xl">
+                                <strong class="text-red-400">Critical Risk:</strong>
+                                Paid engagement is 2,168% higher than organic (Source: Modash). You are effectively "buying" your relevance. If budget cuts happen, engagement collapses.
+                            </div>
+                            <div class="text-3xl font-bold text-white mt-1">${tData.metrics.paidLev}</div>
+                            <div class="text-xs text-amber-500 mt-2">High Dependency</div>
+                        </div>
+
+                        <!-- Spread -->
+                        <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 backdrop-blur-sm relative group cursor-help z-20">
+                            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                                Spread <i data-lucide="info" class="w-3 h-3 text-slate-500"></i>
+                            </div>
+                            <!-- Tooltip -->
+                            <div class="absolute top-full right-0 mt-2 w-56 bg-black text-slate-300 text-[10px] p-3 rounded hidden group-hover:block z-50 border border-slate-700 shadow-xl">
+                                <strong class="text-purple-400">Stability Metric:</strong>
+                                Gap between Top Post (5.2M) and Lowest (3k). A 1,733x gap means you have no "content floor"—bad videos fail completely.
+                            </div>
+                            <div class="text-3xl font-bold text-rose-500 mt-1">${tData.metrics.spread}</div>
+                            <div class="text-xs text-slate-400 mt-2">Consistency Gap</div>
+                        </div>
+                    </div>
+
+                    <div class="grid lg:grid-cols-3 gap-8">
+                        <!-- Heatmap (AUDITED: Data corrected to [4,3,1,0,0,9,13]) -->
+                        <div class="lg:col-span-2 bg-slate-800/40 p-6 rounded-2xl border border-slate-700 relative">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="text-lg font-bold text-white flex items-center gap-2 group cursor-help w-fit">
+                                    The "Mid-Week Void"
+                                    <i data-lucide="info" class="w-4 h-4 text-slate-500"></i>
+                                    <!-- Tooltip -->
+                                    <div class="absolute top-8 left-0 w-64 bg-black text-slate-300 text-[10px] p-3 rounded hidden group-hover:block z-50 border border-slate-700 shadow-xl font-normal">
+                                        <strong class="text-white">Posting Pattern Analysis:</strong><br>
+                                        You dominate the weekend (22 posts Sat/Sun) which is great for match coverage. <br><br>
+                                        <span class="text-rose-400 font-bold">THE GAP:</span> You go nearly silent Wed-Fri (only 1 post). This causes the algorithm to "cool down" right before your big weekend games, reducing their potential reach.
+                                    </div>
+                                </h3>
+                                <div class="flex gap-4 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                                    <span class="flex items-center gap-1"><div class="w-2 h-2 bg-emerald-500 rounded-full"></div> Activity</span>
+                                    <span class="flex items-center gap-1"><div class="w-2 h-2 border border-slate-500 rounded-full"></div> Dead Zone</span>
+                                </div>
+                            </div>
+                            
+                            <div class="heatmap-grid">
+                                ${heatmapCells}
+                            </div>
+                            <div class="flex justify-between mt-2 text-xs text-slate-500 font-mono uppercase">
+                                <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+                            </div>
+                            <p class="mt-4 text-sm text-slate-400">
+                                <strong class="text-white">Strategic Opportunity:</strong> Use automated archival clips to fill the Wed-Fri void. Keep the algorithm "hot" so your Saturday match content lands with maximum impact.
+                            </p>
+                        </div>
+
+                        <!-- Volatility -->
+                        <div class="bg-slate-800/40 p-6 rounded-2xl border border-slate-700 relative">
+                            <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2 group cursor-help w-fit">
+                                Volatility Check
+                                <i data-lucide="info" class="w-4 h-4 text-slate-500"></i>
+                                <!-- Tooltip -->
+                                <div class="absolute top-8 right-0 w-64 bg-black text-slate-300 text-[10px] p-3 rounded hidden group-hover:block z-50 border border-slate-700 shadow-xl font-normal">
+                                    <strong class="text-rose-400">The Problem:</strong>
+                                    While your "Top Post" is huge (5.2M), your Median (middle post) is ~400k, and your floor is 3k. Reliable channels have a much tighter grouping. We need to raise the floor.
+                                </div>
+                            </h3>
+                            <div class="space-y-6">
+                                <div>
+                                    <div class="flex justify-between text-xs text-slate-400 mb-2"><span>Top Post</span><span class="text-white font-bold">5.2M</span></div>
+                                    <div class="w-full bg-slate-700 h-2 rounded-full"><div class="bg-emerald-500 h-2 rounded-full" style="width: 100%"></div></div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-xs text-slate-400 mb-2"><span>Median</span><span class="text-white font-bold">~400k</span></div>
+                                    <div class="w-full bg-slate-700 h-2 rounded-full"><div class="bg-slate-500 h-2 rounded-full" style="width: 10%"></div></div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-xs text-slate-400 mb-2"><span>Weakest</span><span class="text-rose-500 font-bold">3k</span></div>
+                                    <div class="w-full bg-slate-700 h-2 rounded-full"><div class="bg-rose-500 h-2 rounded-full" style="width: 1%"></div></div>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-4 italic">
+                                Huge gap between hits and misses. We need to raise the "floor" (the 3k posts).
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        function renderSimulator() {
+            const container = document.getElementById('content');
+            document.getElementById('page-title').innerText = "Strategic Simulator";
+            
+            // MATH ENGINE
+            const baselineViews = VAULT.tiktok.simBaseline;
+            const optimizedViews = VAULT.tiktok.simOptimized;
+            const baselineCPM = 2.5;
+            
+            const totalClips = APP_STATE.simMatches * APP_STATE.simClips * 4; // 4 weeks
+            const blendedRate = APP_STATE.simMode === 'baseline' 
+                ? baselineViews 
+                : (optimizedViews * 0.2) + (baselineViews * 0.8);
+            
+            const totalViews = totalClips * blendedRate;
+            const estValue = (totalViews / 1000) * baselineCPM;
+
+            container.innerHTML = `
+                <div class="max-w-4xl mx-auto pb-12">
+                    <div class="bg-slate-900 text-white rounded-2xl p-8 shadow-xl border border-slate-800">
+                        <div class="text-center mb-8">
+                            <h2 class="text-2xl font-bold mb-2">Growth Simulator</h2>
+                            <p class="text-slate-400">Model what happens when we fill those "Dead Zones" with automated clips.</p>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-12 mb-12">
+                            <!-- Inputs -->
+                            <div class="space-y-8">
+                                <div>
+                                    <div class="flex justify-between mb-2"><label class="text-sm font-medium text-slate-300">Matches / Week</label><span class="text-emerald-400 font-bold">${APP_STATE.simMatches}</span></div>
+                                    <input type="range" min="1" max="20" value="${APP_STATE.simMatches}" oninput="updateSimInput('simMatches', this.value)" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500">
+                                </div>
+                                <div>
+                                    <div class="flex justify-between mb-2"><label class="text-sm font-medium text-slate-300">Clips / Match</label><span class="text-emerald-400 font-bold">${APP_STATE.simClips}</span></div>
+                                    <input type="range" min="1" max="10" value="${APP_STATE.simClips}" oninput="updateSimInput('simClips', this.value)" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500">
+                                </div>
+
+                                <div class="space-y-3 pt-4 border-t border-slate-800">
+                                    <label class="text-sm font-medium text-slate-400 block mb-2">Strategy Mode</label>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <button onclick="setSimMode('baseline')" class="p-3 rounded border text-center transition-all ${APP_STATE.simMode === 'baseline' ? 'bg-slate-800 border-white text-white' : 'border-slate-700 text-slate-500 hover:bg-slate-800'}">
+                                            <div class="font-bold text-sm">Manual</div>
+                                            <div class="text-[10px]">Baseline Avg</div>
+                                        </button>
+                                        <button onclick="setSimMode('optimized')" class="p-3 rounded border text-center transition-all ${APP_STATE.simMode === 'optimized' ? 'bg-emerald-900/40 border-emerald-500 text-emerald-400' : 'border-slate-700 text-slate-500 hover:bg-slate-800'}">
+                                            <div class="font-bold text-sm">Magnifi AI</div>
+                                            <div class="text-[10px]">Optimized Mix</div>
+                                        </button>
+                                    </div>
+                                    <p class="text-[10px] text-slate-500 mt-2 text-center">
+                                        ${APP_STATE.simMode === 'baseline' ? 'Uses your historical average (17.8k views).' : 'Assumes AI picks better clips, boosting 20% of them to "Viral" status (291k views).'}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Outputs -->
+                            <div class="space-y-4">
+                                <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
+                                    <div class="text-xs text-slate-500 uppercase tracking-wider mb-1">Monthly Volume</div>
+                                    <div class="text-3xl font-bold text-white">${totalClips} <span class="text-lg text-slate-600 font-normal">clips</span></div>
+                                </div>
+                                <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
+                                    <div class="text-xs text-slate-500 uppercase tracking-wider mb-1">Proj. Views</div>
+                                    <div class="text-3xl font-bold text-white">${(totalViews / 1000000).toFixed(1)}M</div>
+                                </div>
+                                <div class="bg-emerald-900/20 p-6 rounded-xl border border-emerald-500/30 relative group cursor-help">
+                                    <div class="text-xs text-emerald-400 uppercase tracking-wider mb-1 flex items-center gap-1">
+                                        Est. Media Value <i data-lucide="info" class="w-3 h-3"></i>
+                                    </div>
+                                    <!-- Tooltip -->
+                                    <div class="absolute bottom-full right-0 mb-2 w-64 bg-slate-900 text-white text-[10px] p-3 rounded hidden group-hover:block z-50 border border-slate-700 shadow-xl">
+                                        <strong class="text-emerald-400 block mb-1">Formula:</strong>
+                                        Value = (Total Views / 1,000) × $2.50<br><br>
+                                        This calculates the estimated media value based on a $2.50 CPM. It represents the equivalent ad spend a sponsor (like Nissan) would pay to reach this viewership volume.
+                                    </div>
+                                    <div class="text-3xl font-bold text-emerald-300">$${Math.round(estValue).toLocaleString()}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                         <!-- NEW: Feature Cards (Extracted from TikTok Report) -->
+                        <div class="grid md:grid-cols-3 gap-4 border-t border-slate-800 pt-8">
+                            ${VAULT.tiktok.simFeatures.map(f => `
+                                <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                                    <div class="p-2 bg-slate-700 rounded-lg w-fit mb-3 text-emerald-400"><i data-lucide="${f.icon}" class="w-4 h-4"></i></div>
+                                    <h4 class="font-bold text-white text-sm mb-1">${f.title}</h4>
+                                    <p class="text-[10px] text-slate-400 leading-relaxed">${f.desc}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                         <div class="text-center text-xs text-slate-500 mt-8">
+                            *CPM estimated at $2.50. This represents the equivalent media value generated by optimizing content strategy.
+                        </div>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        // --- INITIALIZATION ---
+        window.onload = () => {
+            router('business'); // Start at business view
+        }
+
+    </script>
+</body>
+</html>
